@@ -125,7 +125,7 @@ http.createServer(function(request, response) {
 
            var pidd = r[1]
          
-            fs.writeFile("working/"+pidd+"/cmd", dd, function(err) {
+            fs.writeFile("working/"+pidd+"/cmd.bat", dd, function(err) {
 
                 console.log("cmd saved");
 
@@ -133,17 +133,17 @@ http.createServer(function(request, response) {
                 console.log("run ffmpeg ...")
 
     
-          let ls = spawn("bash", ["working/"+pidd+"/cmd"]);
+         // let ls = spawn("bash", ["working/"+pidd+"/cmd"]);
 
-          //let ls   = spawn('cmd.exe', ['/c', "working/abcd/cmd"]);
+          let ls = spawn('cmd.exe', ['/c', "working\\"+pidd+"\\cmd.bat"]);
 
 
           ls.stdout.on('data', function (data) {
-            console.log('stdout: ' + data.toString());
+            console.log('spWstdout: ' + data.toString());
           });
           
           ls.stderr.on('data', function (data) {
-            console.log('stderr: ' + data.toString());
+            console.log('spWstderr: ' + data.toString());
           });
           
           ls.on('exit', function (code) {
@@ -215,9 +215,9 @@ ls.on('exit', function (code) {
 
     fs.exists(filename, function(exists) {
         if (!exists) {
-            response.writeHead(404, { "Content-Type": "text/plain" });
-            response.write(request.url + "404 Not Found\n");
-            response.end();
+           // response.writeHead(404, { "Content-Type": "text/plain" });
+           // response.write(request.url + "404 Not Found\n");
+           // response.end();
             return;
         }
 
