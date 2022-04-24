@@ -1,0 +1,264 @@
+var http = require("http"),
+    url = require("url"),
+    path = require("path"),
+    fs = require("fs"),
+    port = process.argv[2] || 8833;
+
+function checkfileexists(file) {
+
+return fs.existsSync(file)
+
+
+}
+
+
+const { exec } = require("child_process");
+
+var exec2 = require('child_process').exec;
+
+
+const { spawn } = require('child_process');
+
+async function run(command) {
+    return new Promise( resolve => {
+        let args = parseArgsStringToArgv(command);
+        let cmd = args.shift();
+
+        console.log(cmd, args);
+
+        let step = spawn(cmd, args);
+
+        step.stdout.pipe(process.stdout);
+        step.stderr.pipe(process.stderr);
+
+        step.on('close', (code) => {
+           resolve(code);
+        });
+    });
+}
+
+
+
+http.createServer(function(request, response) {
+
+
+
+
+    var uri = url.parse(request.url).pathname
+
+    
+    if (uri == '/') {
+     var filename = path.dirname(require.main.filename)+"/appdata"+uri
+    } else {
+     var filename = process.cwd()+"/appdata"+uri
+    }
+    
+
+
+
+
+
+    var re = new RegExp('/gen/(.*)/(.*)');
+    var r = request.url.match(re);
+
+    if (r) {
+
+        var body = ''
+        request.on('data', function(data) {
+            body += data
+
+            var base64Data = body.replace(/^data:image\/png;base64,/, "");
+
+            require("fs").writeFile("working/"+r[1]+"/"+r[2]+ ".png", base64Data, 'base64', function(err) {
+               
+            });
+        })
+
+
+        response.writeHead(200);
+        response.write("ok");
+        response.end();
+        return
+    }
+
+
+    var re = new RegExp('/genau/(.*)');
+    var r = request.url.match(re);
+
+    if (r) {
+
+        var body = ''
+        request.on('data', function(data) {
+            body += data
+
+            var base64Data = body.replace(/^data:audio\/mpeg;base64,/, "");
+
+
+            var dirx = 'working/'+r[1];
+
+            if (!fs.existsSync(dirx)){
+                fs.mkdirSync(dirx);
+            }
+
+
+            require("fs").writeFile(dirx+"/"+r[1] + ".mp3", base64Data, 'base64', function(err) {
+               
+            });
+        })
+
+
+        response.writeHead(200);
+        response.write("ok");
+        response.end();
+        return
+    }
+
+
+
+    var re = new RegExp('/cmd/(.*)');
+    var r = request.url.match(re);
+
+    if (/*request.url == '/cmd'*/ r) {
+        response.writeHead(200);
+
+        request.on('data', function(dd) {
+
+           var pidd = r[1]
+         
+            fs.writeFile("working/"+pidd+"/cmd", dd, function(err) {
+
+                console.log("cmd saved");
+
+
+                console.log("run ffmpeg ...")
+
+    
+          let ls = spawn("bash", ["working/"+pidd+"/cmd"]);
+
+          //let ls   = spawn('cmd.exe', ['/c', "working/abcd/cmd"]);
+
+
+          ls.stdout.on('data', function (data) {
+            console.log('stdout: ' + data.toString());
+          });
+          
+          ls.stderr.on('data', function (data) {
+            console.log('stderr: ' + data.toString());
+          });
+          
+          ls.on('exit', function (code) {
+            console.log('child process exited with code ' + code.toString());
+          });
+
+
+
+            }); 
+            
+
+          
+
+
+/*
+          var spawn = require('child_process').spawn,
+    ls    = spawn('ffmpeg', ['-lh', '/usr']);
+
+ls.stdout.on('data', function (data) {
+  console.log('stdout: ' + data.toString());
+});
+
+ls.stderr.on('data', function (data) {
+  console.log('stderr: ' + data.toString());
+});
+
+ls.on('exit', function (code) {
+  console.log('child process exited with code ' + code.toString());
+});
+
+*/
+
+/*
+          var exec = require('child_process').exec;
+          var coffeeProcess = exec(dd+"");
+          
+          console.log("->"); 
+          coffeeProcess.stdout.on('data', function(data) {
+              console.log(data+"is"); 
+          });
+*/
+
+//require('child_process').exec(dd+"", { stdio: 'inherit' });
+          
+       /*     exec("" + "", (error, stdout, stderr) => {
+                if (error) {
+                    console.log(`error: ${error.message}`);
+                    return;
+                }
+                if (stderr) {
+                    console.log(`stderr: ${stderr}`);
+                    return;
+                }
+                console.log(`stdout: ${stdout}`);
+            });
+*/
+
+
+
+
+        })
+
+        response.write("run");
+        response.end();
+
+
+
+    }
+
+    fs.exists(filename, function(exists) {
+        if (!exists) {
+            response.writeHead(404, { "Content-Type": "text/plain" });
+            response.write(request.url + "404 Not Found\n");
+            response.end();
+            return;
+        }
+
+        if (fs.statSync(filename).isDirectory())  {
+          filename += 'app.html';
+        }
+
+        fs.readFile(filename, "binary", function(err, file) {
+            if (err) {
+                response.writeHead(500, { "Content-Type": "text/plain" });
+                response.write(err + "\n");
+                response.end();
+                return;
+            }
+
+            response.writeHead(200);
+           
+           /* 
+            
+            if (checkfileexists('cover.png')) { 
+               zcover = 'cover.png';
+              
+	     } 
+
+            if (checkfileexists('cover.mp4')) { 
+               zcover = 'cover.mp4';
+              
+	     } 
+	     */
+
+            response.write(file.replace("adsc","coverx = 'nothing' \n"), "binary");
+            
+            
+            
+            response.end();
+        });
+    });
+}).listen(parseInt(port, 10));
+
+var childProc = require('child_process');
+//childProc.exec('/usr/bin/google-chrome-stable "http://localhost:8888/"');
+childProc.exec('chrome.exe "http://localhost:'+port+'/"');
+
+console.log("faler running @\n  => http://localhost:" + port + "/\n");

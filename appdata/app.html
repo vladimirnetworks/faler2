@@ -1,0 +1,97 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <script src="script.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <!-- <script src="//unpkg.com/canvas-txt"></script> -->
+
+    <!-- <link rel="stylesheet" type="text/css" href="styles.css"> -->
+  </head>
+  <body>
+    <form>
+      <input id="f" type="file" multiple accept=".txt,.jpg,.jpeg,.png,.mp3" />
+    </form>
+
+    <div style="position:fixed;bottom:4vh;display:none">
+
+    <select id="ft" disabled>
+    <option value="mp4"  >mp4</option>
+    <option value="webm" selected>webm</option>
+
+    </select> <br>
+
+
+    vbr<input id="vbr" type="range" min = 1 max = 10000000 step = 1 style="width:500px" value = 1500000><span id="vbrv"></span>Mbps<br>
+    abr<input id="abr" type="range" min = 1 max = 999000 step = 1 style="width:500px" value = 96000><span id="abrv"></span>Kbps<br>
+    max<input id="maxt" type="input" value = 59000>ms<br>
+  
+    <script>
+    $("#vbr").on("change mousemove",()=>{
+       $("#vbrv").html(($("#vbr").val()/1000000).toFixed(2))
+    });
+    $("#vbrv").html(($("#vbr").val()/1000000).toFixed(2));
+
+
+    $("#abr").on("change mousemove",()=>{
+       $("#abrv").html(($("#abr").val()/(1024)).toFixed(2))
+    });
+    $("#abrv").html(($("#abr").val()/1024).toFixed(2));
+
+
+    </script>
+
+  </div>
+
+
+    <div id="fals"></div>
+
+
+
+    <script src="funcs.js"></script>
+    <script>
+
+    var timx = 1000;
+      filer((pid,text, image, audio) => {
+
+
+        var myImage = new Image();
+        myImage.src = URL.createObjectURL(image);
+
+        var audioelem = $("<audio controls></audio>")[0];
+
+        var areader = new FileReader();
+
+        areader.onload = function (e) {
+          $(audioelem).attr('src', e.target.result);
+        };
+        areader.readAsDataURL(audio);
+
+        var reader = new FileReader();
+        reader.readAsText(text, 'UTF-8');
+        reader.onload = function (evt) {
+
+
+          setTimeout(() => {
+            var f = fal({
+              text: evt.target.result.trim() + '\n\n',
+              width: 1080,
+              height: 1080,
+              img: myImage,
+              audioelem: audioelem,
+              titlefont: 'lalezar',
+              textfont: 'irans',
+              tagfont: 'pusab',
+              pid:pid
+            });
+
+            $('#fals').append(f);
+          }, timx);
+          timx = timx+500;
+        };
+      });
+    </script>
+   ..
+  </body>
+</html>
+
