@@ -15,6 +15,29 @@ function d(i) {
   return document.getElementById(i);
 }
 
+function setCookie(name,value,days) {
+  var expires = "";
+  if (days) {
+      var date = new Date();
+      date.setTime(date.getTime() + (days*24*60*60*1000));
+      expires = "; expires=" + date.toUTCString();
+  }
+  document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+}
+function getCookie(name) {
+  var nameEQ = name + "=";
+  var ca = document.cookie.split(';');
+  for(var i=0;i < ca.length;i++) {
+      var c = ca[i];
+      while (c.charAt(0)==' ') c = c.substring(1,c.length);
+      if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+  }
+  return null;
+}
+function eraseCookie(name) {   
+  document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+}
+
 function loopject(o, doo) {
   for (var key in o) {
     if (o.hasOwnProperty(key)) {
@@ -137,6 +160,54 @@ function frame3(inp) {
   me.texts = [];
   me.textsizes = [];
 
+  me.fontname = fontlist();
+  me.fontname.attr("class","allframestitlefonts")
+  me.fontname.val(getCookie("txtfontname1"))
+
+  me.fontname2 = fontlist();
+  me.fontname2.attr("class","allframestextfonts")
+  me.fontname2.val(getCookie("txtfontname2"))
+
+  me.fontname.on('mouseup', () => {
+   
+    setTimeout(()=>{
+      $(".allframestitlefonts").val(me.fontname.val())
+    },100);
+
+    setTimeout(()=>{
+     $(".allframestitlefonts").trigger('change')
+
+    },200);
+
+  });
+
+
+  me.fontname.on('change', () => {
+    me.gen();
+    setCookie("txtfontname1",me.fontname.val(),9999)
+  });
+
+  me.fontname2.on('change', () => {
+    me.gen();
+    setCookie("txtfontname2",me.fontname2.val(),9999)
+  });
+
+  me.fontname2.on('mouseup', () => {
+   
+
+
+    setTimeout(()=>{
+      $(".allframestextfonts").val(me.fontname2.val())
+    },100);
+
+    setTimeout(()=>{
+     $(".allframestextfonts").trigger('change')
+    },200);
+
+
+  });
+
+
   var controller;
 
   for (var x = 0; x <= 2; x++) {
@@ -181,6 +252,7 @@ function frame3(inp) {
 
       ctx.globalAlpha = 0.7;
       ctx.fillStyle = '#FFFFFF';
+/*
       ctx
         .roundRect(
           inp.width * 0.02,
@@ -190,11 +262,22 @@ function frame3(inp) {
           20
         )
         .fill();
+*/
+
+ctx.roundRect(
+  inp.width * 0.02,
+  inp.width * 0.02,
+  inp.width - inp.width * 0.04,
+  inp.height - inp.width * 0.04,
+  20
+).fill();
 
       ctx.globalAlpha = 1;
 
       for (var x = 0; x <= 2; x++) {
-        ctx.font = 'bold ' + inp.titlefontsize + 'px ' + inp.font;
+        //ctx.font = 'bold ' + inp.titlefontsize + 'px ' + inp.font;
+        ctx.font = 'bold ' + inp.titlefontsize + 'px ' +  me.fontname.val();
+       
 
         ctx.fillStyle = '#000000';
 
@@ -207,7 +290,10 @@ function frame3(inp) {
         ctx.font = ' ' + inp.titlefontsize + 'px ' + inp.font;
 
         var canvasTxt = window.canvasTxt.default;
-        canvasTxt.font = inp.font;
+        //canvasTxt.font = inp.font;
+
+        canvasTxt.font = me.fontname2.val();
+
         canvasTxt.fontSize = parseInt($(me.textsizes[x]).val());
         canvasTxt.align = 'right';
         canvasTxt.vAlign = 'top';
@@ -259,6 +345,37 @@ function gen12mah(inp) {
   return davazdah;
 }
 
+function fontlist() {
+
+  var xfont = '<select>';
+  var sl = '';
+var i = 0;
+$.each(zfonts, function(key,valueObj){
+  
+
+    if (i==0) {
+      sl = 'selected';
+   } else {
+     sl = '';
+   }
+
+   i++;
+  xfont += '<option value="'+key+'" '+sl+'>'+key+'</option>';
+
+
+});
+
+
+xfont += '</select>';
+
+
+
+
+
+    return $(xfont);
+
+}
+
 function gencover(inp) {
   var title = inp.title;
 
@@ -268,6 +385,14 @@ function gencover(inp) {
   me.colorpicker = $('<input type="color" value="#FFFF00">');
   me.colorpicker2 = $('<input type="color" value="#000000">');
   me.colorpicker3 = $('<input type="color" value="#FFFFFF">');
+  me.fontsize = $('<input type="value" value="'+parseInt((inp.width * 0.4) / 3)+'">');
+  me.fontname = fontlist();
+  me.fontname.val(getCookie('coverfont'));
+
+  
+
+  me.havback = $('<input type="checkbox" value="1" checked>');
+  me.havstroke = $('<input type="checkbox" value="1" checked>');
 
   var canv = document.createElement('canvas');
   canv.style.width = '100%';
@@ -295,6 +420,32 @@ function gencover(inp) {
     me.gen();
   });
 
+
+  me.fontsize.change(function () {
+    
+    me.gen();
+  });
+
+  me.havback.change(function () {
+    
+    me.gen();
+  })
+
+
+  me.fontname.change(function () {
+    setCookie("coverfont",me.fontname.val(),9999)
+    me.gen();
+  })
+
+  
+
+  
+
+  me.havstroke.change(function () {
+    
+    me.gen();
+  })
+
   me.title.on('keyup',function () {
    
     me.gen();
@@ -313,21 +464,31 @@ function gencover(inp) {
     ctx.drawImage(inp.img, 0, 0, inp.width, inp.height);
     ctx.fillStyle = 'black';
     var canvasTxt = window.canvasTxt.default;
-    canvasTxt.font = inp.font;
-    canvasTxt.fontSize = parseInt((canv.height * 0.4) / 3);
+    //canvasTxt.font = inp.font;
+
+    canvasTxt.font = me.fontname.val();
+
+
+
+    //me.fontsize.val(parseInt((canv.width * 0.4) / 3))
+
+    canvasTxt.fontSize = me.fontsize.val();
     canvasTxt.align = 'center';
     canvasTxt.vAlign = 'middle';
     canvasTxt.justify = true;
     canvasTxt.fontWeight = '';
     canvasTxt.strokeStyle = 'red';
 
-    canvasTxt.lineHeight = parseInt((canv.height * 0.4) / 3) * 1.5;
+    canvasTxt.lineHeight = parseInt((canv.width * 0.4) / 3) * 1.5;
 
     ctx.globalAlpha = 1;
+
+    if (me.havstroke.is(":checked")) {
     globstork = {
       color: me.colorpicker3.val(),
-      size: parseInt((canv.height * 0.4) / 10),
+      size: parseInt((canv.width * 0.4) / 10),
     };
+   }
 
     setTimeout(() => {
       /*   canvasTxt.drawText(
@@ -348,12 +509,16 @@ function gencover(inp) {
       //ctx.fillStyle = 'yellow';
       ctx.fillStyle = me.colorpicker.val();
 
+      if (me.havback.is(":checked")) {
       ctx.fillRect(
         0,
         globyy[0] - globhh[0],
         inp.width,
         /*globyy[globyy.length-1]-globhh[globhh.length-1]*/ 500
       );
+      }
+
+
       globyy = [];
       globhh = [];
       ctx.globalAlpha = 1;
@@ -369,7 +534,7 @@ function gencover(inp) {
       ctx.fillStyle = 'white';
       var canvasTxt2 = window.canvasTxt.default;
       canvasTxt2.font = inp.font2;
-      canvasTxt2.fontSize = parseInt((canv.height * 0.4) / 6);
+      canvasTxt2.fontSize = parseInt((canv.width * 0.4) / 6);
       canvasTxt2.align = 'center';
       canvasTxt2.vAlign = 'bottom';
       canvasTxt2.justify = true;
@@ -450,7 +615,7 @@ function render(inp) {
                                                                     console.log("all frames saved")
 
                                                                     var foldr = 'working/'+pid+"/";
-                                                                    cmd(pid,"ffmpeg -t 59 -f lavfi -i color=c=white:s=1080x1080 -i appdata/blank.png -i "+foldr+"0.png -i "+foldr+"1.png -i "+foldr+"2.png -i "+foldr+"3.png -i "+foldr+"4.png -filter_complex \"[1:v]loop=-1:10000:0[cov0];[cov0]scale=1080:-1[cover];[0:v][cover]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2:shortest=1[mainlayer];[mainlayer][2:v]overlay=0:0:enable='between(t,0,1)'[layer0];[layer0][3:v]overlay=0:0:enable='between(t,1,15.5)'[layer1];[layer1][4:v]overlay=0:0:enable='between(t,15.5,30)'[layer2];[layer2][5:v]overlay=0:0:enable='between(t,30,44.5)'[layer3];[layer3][6:v]overlay=0:0:enable='between(t,44.5,59)'[finalout]\" -i "+foldr+""+pid+".mp3 -af \"atrim="+ctm+",asetpts=PTS-STARTPTS\"  -map [finalout] -shortest  -map 7:a output/"+pid+".mp4 -y");
+                                                                    cmd(pid,"ffmpeg -t 59 -f lavfi -i color=c=white:s="+$("#iwidth").val()+"x"+$("#iheight").val()+" -i appdata/blank.png -i "+foldr+"0.png -i "+foldr+"1.png -i "+foldr+"2.png -i "+foldr+"3.png -i "+foldr+"4.png -filter_complex \"[1:v]loop=-1:10000:0[cov0];[cov0]scale="+$("#iwidth").val()+":-1[cover];[0:v][cover]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2:shortest=1[mainlayer];[mainlayer][2:v]overlay=0:0:enable='between(t,0,1)'[layer0];[layer0][3:v]overlay=0:0:enable='between(t,1,15.5)'[layer1];[layer1][4:v]overlay=0:0:enable='between(t,15.5,30)'[layer2];[layer2][5:v]overlay=0:0:enable='between(t,30,44.5)'[layer3];[layer3][6:v]overlay=0:0:enable='between(t,44.5,59)'[finalout]\" -i "+foldr+""+pid+".mp3 -af \"atrim="+ctm+",asetpts=PTS-STARTPTS\"  -map [finalout] -shortest  -map 7:a output/"+pid+".mp4 -y");
                                                                   
                                                                   }
                                                             }
@@ -598,7 +763,7 @@ function fal(inp) {
   loadfont(inp.tagfont);
 
   var thisfal = $(
-    '<div style="overflow:scroll;height:350px; white-space: nowrap;"></div>'
+    '<div style="overflow:scroll;height:350px; white-space: nowrap;position: relative;"></div>'
   );
 
   var covccont = $(
@@ -620,6 +785,7 @@ function fal(inp) {
   var gcov = gencover({
     font2: inp.tagfont,
     font: inp.titlefont,
+    fontsize:50,
     title: faltitle.title + '\n' + faltitle.text.join('\n') + '',
     width: inp.width,
     height: inp.height,
@@ -632,6 +798,17 @@ function fal(inp) {
   covconto.append(gcov.colorpicker);
   covconto.append(gcov.colorpicker2);
   covconto.append(gcov.colorpicker3);
+  covconto.append('<br> fontsize:');
+  covconto.append(gcov.fontsize);
+  covconto.append('<br> havebg:');
+  covconto.append(gcov.havback);
+  covconto.append('<br> havestroke:');
+  covconto.append(gcov.havstroke);
+
+  covconto.append('<br> fontname:');
+  covconto.append(gcov.fontname);
+
+
   covconto.append('<br>');
   covconto.append(gcov.title);
 
@@ -656,6 +833,13 @@ function fal(inp) {
     var controler = $('<div></div>');
 
     // controler.hide();
+    controler.append('font:');
+    controler.append($(e.fontname));
+    controler.append('<br>');
+
+    controler.append('font2:');
+    controler.append($(e.fontname2));
+    controler.append('<br>');
 
     e.titles.forEach((t, i) => {
       controler.append($(e.textsizes[i]));
@@ -676,7 +860,7 @@ function fal(inp) {
   var alfalsframe = $('canvas', thisfal);
 
   thisfal.append(
-    $('<button>gen</button>').click(() => {
+    $('<button style="position: fixed;right: 5px;">gen</button>').click(() => {
       thisfal.append(
         render({
           audioelem: inp.audioelem,

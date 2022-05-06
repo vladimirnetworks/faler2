@@ -4,6 +4,16 @@
     <script src="script.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" type="text/css" href="styles.css" />
+    <lf>
+    <script>
+      zfonts;
+      appfaler = {};
+      appfaler.fonts = [];
+
+      appfaler.fonts.push("aaa")
+      appfaler.fonts.push("bbb")
+
+    </script>
     <!-- <script src="//unpkg.com/canvas-txt"></script> -->
 
     <!-- <link rel="stylesheet" type="text/css" href="styles.css"> -->
@@ -58,14 +68,19 @@
         var myImage = new Image();
         myImage.src = URL.createObjectURL(image);
 
+
         var audioelem = $("<audio controls></audio>")[0];
-
         var areader = new FileReader();
-
         areader.onload = function (e) {
           $(audioelem).attr('src', e.target.result);
         };
-        areader.readAsDataURL(audio);
+
+        if (audio != null) {
+          areader.readAsDataURL(audio);
+        }
+       
+
+
 
         var reader = new FileReader();
         reader.readAsText(text, 'UTF-8');
@@ -75,8 +90,8 @@
           setTimeout(() => {
             var f = fal({
               text: evt.target.result.trim() + '\n\n',
-              width: 1080,
-              height: 1080,
+              width: parseInt($("#iwidth").val()),
+              height: parseInt($("#iheight").val()),
               img: myImage,
               audioelem: audioelem,
               titlefont: 'lalezar',
@@ -92,6 +107,40 @@
       });
     </script>
    ..
+<br>
+  width <input id="iwidth" value="1080">
+  <br>
+  height <input id="iheight" value="1080">
+
+  <script>
+
+    if (getCookie("iwidth") == null || getCookie("iheight") == null) {
+      setCookie("iwidth","1080",9999)
+      setCookie("iheight","1080",9999)
+    }
+
+    $("#iwidth").val(getCookie("iwidth"));
+    $("#iheight").val(getCookie("iheight"));
+
+    $("#iwidth").on('change', () => {
+
+      setCookie("iwidth",$("#iwidth").val(),9999)
+    });
+
+    $("#iheight").on('change', () => {
+
+      setCookie("iheight",$("#iheight").val(),9999)
+    });
+
+
+
+
+  </script>
+
+  <lffunc>
+
   </body>
+
+
 </html>
 

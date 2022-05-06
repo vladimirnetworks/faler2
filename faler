@@ -39,9 +39,38 @@ async function run(command) {
 
 
 
+
+  
 http.createServer(function(request, response) {
 
+/**/
+fnts = {}
+var lf = `<style>`;
+var lffunc = `<script>`;
 
+fs.readdir('appdata/fonts', (err, files) => {
+    files.forEach(file => {
+        var fnmm = file.replace("\.ttf","").replace(/[^a-z0-9]/gi,'');
+        fnts[fnmm] = file;
+
+
+        lf += `
+          @font-face {
+            font-family: "`+fnmm+`";
+            
+            src: url("fonts/`+file+`") format("truetype");
+            
+            }
+            `;
+
+            lffunc += `
+            loadfont("`+fnmm+`")
+            `;     
+
+
+    });
+  });
+/**/
 
 
     var uri = url.parse(request.url).pathname
@@ -53,6 +82,8 @@ http.createServer(function(request, response) {
      var filename = process.cwd()+"/appdata"+uri
     }
     
+    //console.log(filename);
+
 
 
 
@@ -248,7 +279,22 @@ ls.on('exit', function (code) {
 	     } 
 	     */
 
-            response.write(file.replace("adsc","coverx = 'nothing' \n"), "binary");
+         var restx  = file.replace("adsc","coverx = 'nothing' \n");
+
+
+
+
+         restx = restx.replace("zfonts;","zfonts = JSON.parse('"+JSON.stringify(fnts)+"') ; ");
+
+
+         
+        restx = restx.replace("<lf>",lf+`</style>`);
+
+        restx = restx.replace("<lffunc>",lffunc+`</script>`);
+        
+       
+
+            response.write(restx, "binary");
             
             
             
