@@ -860,7 +860,7 @@ function fal(inp) {
   var alfalsframe = $('canvas', thisfal);
 
   thisfal.append(
-    $('<button style="position: fixed;right: 5px;">gen</button>').click(() => {
+    $('<button style="right: 5px;">gen</button>').click(() => {
       thisfal.append(
         render({
           audioelem: inp.audioelem,
