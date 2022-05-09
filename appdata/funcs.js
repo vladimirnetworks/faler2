@@ -389,12 +389,17 @@ function gencover(inp) {
   me.fontname = fontlist();
   me.fontname.val(getCookie('coverfont'));
 
+
   
 
   me.havback = $('<input type="checkbox" value="1" checked>');
   me.havstroke = $('<input type="checkbox" value="1" checked>');
 
   var canv = document.createElement('canvas');
+
+  me.stroksize = $('<input type="number" value="'+parseInt((canv.width * 0.4) / 5)+'">');
+
+
   canv.style.width = '100%';
   canv.style.backgroundColor = 'green';
   canv.width = inp.width;
@@ -409,6 +414,14 @@ function gencover(inp) {
     ctx.fillStyle = me.colorpicker.val();
     me.gen();
   });
+
+
+  me.stroksize.change(function () {
+    
+    me.gen();
+  });
+
+
 
   me.colorpicker2.change(function () {
     ctx.fillStyle = me.colorpicker2.val();
@@ -486,7 +499,7 @@ function gencover(inp) {
     if (me.havstroke.is(":checked")) {
     globstork = {
       color: me.colorpicker3.val(),
-      size: parseInt((canv.width * 0.4) / 10),
+      size: /*parseInt((canv.width * 0.4) / 10)*/ parseInt(me.stroksize.val()),
     };
    }
 
@@ -763,8 +776,18 @@ function fal(inp) {
   loadfont(inp.tagfont);
 
   var thisfal = $(
-    '<div style="overflow:scroll;height:350px; white-space: nowrap;position: relative;"></div>'
+    '<div window="small" style="overflow:scroll;height:350px; white-space: nowrap;position: relative;"></div>'
   );
+
+  thisfal.dblclick(function() {
+    if (thisfal.attr("window") == 'small') {
+      thisfal.attr("window","big")
+      thisfal.css({"height":"90vh"})
+    } else {
+      thisfal.attr("window","small")
+      thisfal.css({"height":"350px"})
+    }
+  });
 
   var covccont = $(
     '<div style="display:inline-block;margin-left:2rem;width:300px;vertical-align: top;"></div>'
@@ -800,6 +823,8 @@ function fal(inp) {
   covconto.append(gcov.colorpicker3);
   covconto.append('<br> fontsize:');
   covconto.append(gcov.fontsize);
+  covconto.append('<br> stroksize:');
+  covconto.append(gcov.stroksize);
   covconto.append('<br> havebg:');
   covconto.append(gcov.havback);
   covconto.append('<br> havestroke:');
