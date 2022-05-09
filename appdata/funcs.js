@@ -212,7 +212,7 @@ function frame3(inp) {
 
   for (var x = 0; x <= 2; x++) {
     var posval = document.createElement('input');
-    posval.type = 'range';
+    posval.type = 'number';
     posval.min = 0;
     posval.style.width = '100%';
     posval.max = inp.height;
@@ -232,7 +232,7 @@ function frame3(inp) {
     me.texts.push(text);
 
     var textsize = document.createElement('input');
-    textsize.type = 'range';
+    textsize.type = 'number';
     textsize.style.width = '100%';
     textsize.min = 0;
     textsize.max = inp.height;
