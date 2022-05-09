@@ -779,7 +779,10 @@ function fal(inp) {
     '<div window="small" style="overflow:scroll;height:350px; white-space: nowrap;position: relative;"></div>'
   );
 
-  thisfal.dblclick(function() {
+  thisfal.dblclick(function(e) {
+    
+    if(e.target !== e.currentTarget) return;
+
     if (thisfal.attr("window") == 'small') {
       thisfal.attr("window","big")
       thisfal.css({"height":"90vh"})
