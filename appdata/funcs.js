@@ -385,6 +385,7 @@ function gencover(inp) {
   me.colorpicker = $('<input type="color" value="#FFFF00">');
   me.colorpicker2 = $('<input type="color" value="#000000">');
   me.colorpicker3 = $('<input type="color" value="#FFFFFF">');
+  me.tag = $('<input type="text" value="anjelaworld@">');
   me.fontsize = $('<input type="value" value="'+parseInt((inp.width * 0.4) / 3)+'">');
   me.fontname = fontlist();
   me.fontname.val(getCookie('coverfont'));
@@ -417,6 +418,12 @@ function gencover(inp) {
 
 
   me.stroksize.change(function () {
+    
+    me.gen();
+  });
+
+
+  me.tag.change(function () {
     
     me.gen();
   });
@@ -554,7 +561,7 @@ function gencover(inp) {
 
       canvasTxt.drawText(
         ctx,
-        'anjelaworld@',
+        me.tag.val(),
         0,
         0,
         canv.width,
@@ -828,6 +835,8 @@ function fal(inp) {
   covconto.append(gcov.fontsize);
   covconto.append('<br> stroksize:');
   covconto.append(gcov.stroksize);
+  covconto.append('<br> tag:');
+  covconto.append(gcov.tag);
   covconto.append('<br> havebg:');
   covconto.append(gcov.havback);
   covconto.append('<br> havestroke:');
